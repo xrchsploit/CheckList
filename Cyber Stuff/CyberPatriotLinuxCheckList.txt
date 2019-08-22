@@ -1,0 +1,155 @@
+Take picture of all logins
+Top right of image go to the gear (where you login as a different user)>system settings> software and updates> check all boxes & then set it to "Daily,download automatically, imediatly"
+ctrl + alt T = terminal
+"sudo apt-get update"
+"sudo apt-get upgrade"
+"sudo gedit /etc/group" lets you see all users and admins
+"sudo gedit /etc/passwd" lists users and passwords **If they dont belong just (#) them out*
+Open web browser to check if web server is running. Go to browser and type "localhost" 
+to check the webserver dir use "cd /var/www" then "ls". *If theres anything shady check it out with "nano" and the file dirand use rm to remove it*
+To run the last command you ran do "sudo !!"
+"sudo apt-get purge apache2" uninstall apache 
+"sudo apt-get purge vsftpd" uninstall ftp
+"sudo apt-get purge mysql-server-5.6" uninstall mysql web server
+"sudo apt-get install nmap"
+To see services running on the system do "nmap localhost"
+$
+Secure SSH
+"sudo gedit /etc/ssh/sshd_config"
+PermitRootLogin no
+$
+Pass policies
+"sudo gedit /etc/login.defs"
+PassMaxDays 30
+PassMinDays 3
+PassWarnAge 7 
+$
+Disable Guest account 
+"cd /usr/share/lightdm/lightdm.conf.d/"
+Then "sudo gedit 50-unbuntu.conf"
+After that in the file that pops up add the line "allow-guest=false"
+Then add "greeter-show-manual-login=true" *makes it so you have to type in the users whole login not just password
+Then do "sudo service lightdm restart
+$ 
+Disable unauthorized services and get backdoors
+"cd /etc/sudoers.d/" "ls" and check for anything shady should only be a readme
+"sudo visudo" check to make sure authorized groups are allowed, or leave it as default
+Then "sudo crontab" this checks anything that can be run at like startup, delete anything thats malicious or comment it out (#)
+Backdoor checking
+"cd /bin/"
+"ls"
+If there was any malicious files in "crontab" do "./(file directory)" then it should run  if its executable
+then do "sudo rm (file or file dir)" then delete it
+Then do "sudo apt-get purge netcat-openbsd"
+Then do "sudo apt-get purge netcat-traditional"
+Then do "sudo apt-get purge netcat [Tab]" to see if theres any other versions that need to be uninstalled
+$
+Packages to remove
+Basic Kali Linux tools you should know
+"sudo apt-get purge john" john = johntheripper
+$
+Remove user completely
+go to home dir with the file manager
+$
+searh dpkgs
+"dpkg -i chrome.deb"
+installs packages for chrome or stuff like that
+$
+set passwords
+"sudo passwd (username) [enter]
+If theres a live hacker do "sudo apt-get install slay"
+Then do "slay (hackers name)"
+$
+Shadow folder- where all password hashes are stored
+"cd /etc/"
+"sudo chmod 777 shadow"
+"sudo gedit shadow"
+Then when done in here do "sudo gedit chmod 640 shadow" to change permissions back
+$
+Dns settings
+to check them do "cd /etc/"
+"sudo gedit resolv.conf"
+change name server to "127.0.0.1" *local dns* or "8.8.8.8" *googles dns*
+$ 
+host settings
+"cd /etc/"
+"sudo gedit hosts"
+Check dns IPs to make sure they dont lead to random other websites that are shady
+$
+More crontabs
+"cd /etc/"
+"sudo su"*gain root privelages*
+"cd /var/spool/cron/crontabs/
+check their crontabs if multiple users have it
+"gedit root" *gedit etc account*
+same as before if theres any file paths that dont belong comment it out
+$
+Disable the Super User or "su"
+"cd /etc/pam.d/"
+"ls"
+"sudo nano su"
+look for line that contains 'SU_WHEEL_ONLY'
+then the line underneath should be "#auth	required	pan_wheel.so"
+un comment that line to disable su, su is disabled unless your in the "Wheel" group
+an alternative is do "sudo gedit /etc/login.defs" then uncomment "SU_WHEEL_ONLY"
+$
+Check wheel group
+"sudo gedit /etc/group"
+sometimes it isnt there but if it is only users in that line can use "su" so anyone that isnt supposed to be there, remove them
+$
+Check more startups 
+"cd /etc/"
+"sudo gedit rc.local"
+This should have text that claims it does nothing which is good but then if theres anything else delete that text not the whole file
+$
+Same as before but for init
+"cd /etc/"
+"cd init.d/"
+"ls"
+$
+if needed take off samba
+"sudo apt-get purge samba"
+$
+check every log made by users
+"cd /var/log/"
+"ls"
+shows little things but the one below shows specifics
+"sudo gedit auth.log"
+$
+check listenning ports
+"netstat -tulpn"
+or "lsof -i -n -P
+or "ss -l" 
+To kill process do "kill (process ID)
+$
+Lock command history file
+"sudo chmod 640 .bash_history"
+$
+get a list of running processes
+"sudo service --status-all > services.txt
+then do 
+"sudo gedit services.txt"
+to see the list, check all running services if theres a service that shoulnt be running close it.
+$
+Firewall 
+"ufw enable" starts it
+Say theres a hacker on you and you needto close a port, do "ufw deny (port number)"
+$
+Tools 
+"sudo apt-get install rkhunter"
+"no configuration"
+to start it do "rkhunter"
+Next tool
+"sudo apt-get install sysv-rc-conf"
+to start "sysv-rc-conf"
+if it says something about permissions just do "sudo !!"
+This shows more hidden startup programs 
+next tool
+"chage"
+this shows more password options
+
+
+
+
+
+ 

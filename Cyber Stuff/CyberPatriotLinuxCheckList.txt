@@ -148,7 +148,8 @@ next tool
 "chage"
 this shows more password options
 
-
+To show all accounts with no password
+sudo awk -F: '($2 == "") {print}' /etc/shadow
 
 
 

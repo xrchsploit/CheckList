@@ -150,7 +150,8 @@ this shows more password options
 
 To show all accounts with no password
 sudo awk -F: '($2 == "") {print}' /etc/shadow
-
+To show all open and listening ports
+'sudo lsof -i -P -n | grep LISTEN'
 
 
  

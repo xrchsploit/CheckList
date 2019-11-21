@@ -156,6 +156,60 @@ $
 remove or add user
 sudo userdel -r (name)
 sudo useradd (name)
+$
+Get synaptic, show all packages installed
+sudo apt-get install synaptic
+synaptic
+check for things like postgresql and remove it
+$
+sudo chmod 600 shadow
+to make permissions only for root to access the password file
+$
+sudo apt-get install gufw 
+depending on the situation make the setting like office or personal
+then make incoming allow all
+then outgoing allow all
+then if theres a backdoor installed delete it and block the port its listening on
+$
+sudo apt-get purge postgresql 
+stops the metasploit framework
+$
+locate password.txt
+locates any files that are from like brute forcing, no user should have one 
+$
+go to firefox then the settings icon in the right hand corner
+then go to "privacy and security" 
+make it the most secure you think you can 
+$
+sudo apt-get autoremove
+this command gets rid of all like extensions of a package, netcat-openbsd, etc
+$
+sudo apt-get purge telnet[tab]
+make sure telnet is removed
+$
+Remove all these games: espdiff gnome-mines   sol      wesnoth-1.10         wesnoth-1.10-nolog     
+wesnoth-nolog gnome-mahjongg  gnome-sudoku  wesnoth  wesnoth-1.10_editor  wesnoth-1.10-smallgui
+$ 
+sudo passwd --lock root
+to lock the root acount
+$
+Using the gui disable autologin on the account your logged into
+$
+sudo apt-get install clamav
+then do "clamscan" to scan for viruses
+$
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+Just use those commands one by one to disable ipv6
+no need to edit anything just one by one paste them in terminal
+then do "ip a" and make sure no instance of ipv6 shows up
+$
+
+
+
+
+
 
 
  

@@ -1,0 +1,483 @@
+Take picture of all logins
+Top right of image go to the gear (where you login as a different user)>system settings> software and updates> check all boxes & then set it to "Daily,download automatically, imediatly"
+ctrl + alt T = terminal
+"sudo apt-get update"
+"sudo apt-get upgrade"
+"sudo gedit /etc/group" lets you see all users and admins
+"sudo gedit /etc/passwd" lists users and passwords **If they dont belong just (#) them out*
+Open web browser to check if web server is running. Go to browser and type "localhost" 
+to check the webserver dir use "cd /var/www" then "ls". *If theres anything shady check it out with "nano" and the file dirand use rm to remove it*
+To run the last command you ran do "sudo !!"
+"sudo apt-get purge apache2" uninstall apache 
+"sudo apt-get purge vsftpd" uninstall ftp
+"sudo apt-get purge mysql-server-5.6" uninstall mysql web server
+"sudo apt-get purge wesnoth"
+"sudo apt-get install nmap"
+To see services running on the system do "nmap localhost"
+$
+Secure SSH
+"sudo gedit /etc/ssh/sshd_config"
+PermitRootLogin no
+$
+Pass policies
+"sudo gedit /etc/login.defs"
+PassMaxDays 30
+PassMinDays 3
+PassWarnAge 7 
+$
+Disable Guest account 
+"cd /usr/share/lightdm/lightdm.conf.d/"
+Then "sudo gedit 50-unbuntu.conf"
+After that in the file that pops up add the line "allow-guest=false"
+Then add "greeter-show-manual-login=true" *makes it so you have to type in the users whole login not just password
+Then do "sudo service lightdm restart
+$ 
+Disable unauthorized services and get backdoors
+"cd /etc/sudoers.d/" "ls" and check for anything shady should only be a readme
+"sudo visudo" check to make sure authorized groups are allowed, or leave it as default
+Then "sudo crontab" this checks anything that can be run at like startup, delete anything thats malicious or comment it out (#)
+Backdoor checking
+"cd /bin/"
+"ls"
+If there was any malicious files in "crontab" do "./(file directory)" then it should run  if its executable
+then do "sudo rm (file or file dir)" then delete it
+Then do "sudo apt-get purge netcat-openbsd"
+Then do "sudo apt-get purge netcat-traditional"
+Then do "sudo apt-get purge netcat [Tab]" to see if theres any other versions that need to be uninstalled
+$
+Packages to remove
+Basic Kali Linux tools you should know
+"sudo apt-get purge john" john = johntheripper
+$
+Remove user completely
+go to home dir with the file manager
+$
+searh dpkgs
+"dpkg -i chrome.deb"
+installs packages for chrome or stuff like that
+$
+set passwords
+"sudo passwd (username) [enter]
+If theres a live hacker do "sudo apt-get install slay"
+Then do "slay (hackers name)"
+$
+Shadow folder- where all password hashes are stored
+"cd /etc/"
+"sudo chmod 777 shadow"
+"sudo gedit shadow"
+Then when done in here do "sudo gedit chmod 640 shadow" to change permissions back
+$
+Dns settings
+to check them do "cd /etc/"
+"sudo gedit resolv.conf"
+change name server to "127.0.0.1" *local dns* or "8.8.8.8" *googles dns*
+$ 
+host settings
+"cd /etc/"
+"sudo gedit hosts"
+Check dns IPs to make sure they dont lead to random other websites that are shady
+$
+More crontabs
+"cd /etc/"
+"sudo su"*gain root privelages*
+"cd /var/spool/cron/crontabs/
+check their crontabs if multiple users have it
+"gedit root" *gedit etc account*
+same as before if theres any file paths that dont belong comment it out
+$
+Disable the Super User or "su"
+"cd /etc/pam.d/"
+"ls"
+"sudo nano su"
+look for line that contains 'SU_WHEEL_ONLY'
+then the line underneath should be "#auth	required	pan_wheel.so"
+un comment that line to disable su, su is disabled unless your in the "Wheel" group
+an alternative is do "sudo gedit /etc/login.defs" then uncomment "SU_WHEEL_ONLY"
+$
+Check wheel group
+"sudo gedit /etc/group"
+sometimes it isnt there but if it is only users in that line can use "su" so anyone that isnt supposed to be there, remove them
+$
+Check more startups 
+"cd /etc/"
+"sudo gedit rc.local"
+This should have text that claims it does nothing which is good but then if theres anything else delete that text not the whole file
+$
+Same as before but for init
+"cd /etc/"
+"cd init.d/"
+"ls"
+$
+if needed take off samba
+"sudo apt-get purge samba"
+$
+check every log made by users
+"cd /var/log/"
+"ls"
+shows little things but the one below shows specifics
+"sudo gedit auth.log"
+$
+check listenning ports
+"netstat -tulpn"
+or "lsof -i -n -P
+or "ss -l" 
+To kill process do "kill (process ID)
+$
+Lock command history file
+"sudo chmod 640 .bash_history"
+$
+get a list of running processes
+"sudo service --status-all > services.txt
+then do 
+"sudo gedit services.txt"
+to see the list, check all running services if theres a service that shoulnt be running close it.
+$
+Firewall 
+"ufw enable" starts it
+Say theres a hacker on you and you needto close a port, do "ufw deny (port number)"
+$
+Tools 
+"sudo apt-get install rkhunter"
+"no configuration"
+to start it do "rkhunter"
+Next tool
+"sudo apt-get install sysv-rc-conf"
+to start "sysv-rc-conf"
+if it says something about permissions just do "sudo !!"
+This shows more hidden startup programs 
+next tool
+"chage"
+this shows more password options
+$
+Get synaptic, show all packages installed
+sudo apt-get install synaptic
+synaptic
+check for things like postgresql and remove it
+$
+sudo chmod 600 shadow
+to make permissions only for root to access the password file
+$
+sudo apt-get install gufw 
+depending on the situation make the setting like office or personal
+then make incoming allow all
+then outgoing allow all
+then if theres a backdoor installed delete it and block the port its listening on
+$
+sudo apt-get purge postgresql 
+stops the metasploit framework
+$
+locate password.txt
+locates any files that are from like brute forcing, no user should have one 
+$
+go to firefox then the settings icon in the right hand corner
+then go to "privacy and security" 
+make it the most secure you think you can 
+$
+sudo apt-get autoremove
+this command gets rid of all like extensions of a package, netcat-openbsd, etc
+$
+sudo apt-get purge telnet[tab]
+make sure telnet is removed
+$
+Remove all these games: espdiff gnome-mines   sol      wesnoth-1.10         wesnoth-1.10-nolog     
+wesnoth-nolog gnome-mahjongg  gnome-sudoku  wesnoth  wesnoth-1.10_editor  wesnoth-1.10-smallgui
+$ 
+sudo passwd --lock root
+to lock the root acount
+$
+Using the gui disable autologin on the account your logged into
+$
+sudo apt-get install clamav
+then do "clamscan" to scan for viruses
+$
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+Just use those commands one by one to disable ipv6
+no need to edit anything just one by one paste them in terminal
+then do "ip a" and make sure no instance of ipv6 shows up
+$
+$
+$
+$
+Read the readme
+
+Note down which ports/users are allowed.
+
+Do Forensics Questions
+
+You may destroy the requisite information if you work on the checklist!
+
+Secure root
+
+set PermitRootLogin no in /etc/ssh/sshd_config
+
+Secure Users
+
+Disable the guest user.
+
+Go to /etc/lightdm/lightdm.conf and add the line
+
+allow-guest=false
+
+Then restart your session with sudo restart lightdm. This will log you out, so make sure you are not executing anything important.
+
+Open up /etc/passwd and check which users
+
+Are uid 0
+Can login
+Are allowed in the readme
+Delete unauthorized users:
+
+sudo userdel -r $user
+
+sudo groupdel $user
+
+Check /etc/sudoers.d and make sure only members of group sudo can sudo.
+
+Check /etc/group and remove non-admins from sudo and admin groups.
+
+Check user directories.
+
+cd /home
+sudo ls -Ra *
+Look in any directories which show up for media files/tools and/or "hacking tools."
+Enforce Password Requirements.
+
+Add or change password expiration requirements to /etc/login.defs.
+
+PASS_MIN_DAYS 7
+PASS_MAX_DAYS 90
+PASS_WARN_AGE 14
+Add a minimum password length, password history, and add complexity requirements.
+
+Open /etc/pam.d/common-password with sudo.
+Add minlen=8 to the end of the line that has pam_unix.so in it.
+Add remember=5 to the end of the line that has pam_unix.so in it.
+Locate the line that has pam.cracklib.so in it. If you cannot find that line, install cracklib with sudo apt-get install libpam-cracklib.
+Add ucredit=-1 lcredit=-1 dcredit=-1 ocredit=- to the end of that line.
+Implement an account lockout policy.
+
+Open /etc/pam.d/common-auth.
+Add deny=5 unlock_time=1800 to the end of the line with pam_tally2.so in it.
+Change all passwords to satisfy these requirements.
+
+chpasswd is very useful for this purpose.
+
+Enable automatic updates
+
+In the GUI set Update Manager->Settings->Updates->Check for updates:->Daily.
+
+Secure ports
+
+sudo ss -ln
+If a port has 127.0.0.1:$port in its line, that means it's connected to loopback and isn't exposed. Otherwise, there should only be ports which are specified in the readme open (but there probably will be tons more).
+For each open port which should be closed:
+sudo lsof -i :$port
+Copy the program which is listening on the port. whereis $program
+Copy where the program is (if there is more than one location, just copy the first one). dpkg -S $location
+This shows which package provides the file (If there is no package, that means you can probably delete it with rm $location; killall -9 $program). sudo apt-get purge $package
+Check to make sure you aren't accidentally removing critical packages before hitting "y".
+sudo ss -l to make sure the port actually closed.
+Secure network
+
+Enable the firewall
+
+sudo ufw enable
+
+Enable syn cookie protection
+
+sysctl -n net.ipv4.tcp_syncookies
+
+Disable IPv6 (Potentially harmful)
+
+echo "net.ipv6.conf.all.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf
+
+Disable IP Forwarding
+
+echo 0 | sudo tee /proc/sys/net/ipv4/ip_forward
+
+Prevent IP Spoofing
+
+echo "nospoof on" | sudo tee -a /etc/host.conf
+
+Install Updates
+
+Start this before half-way.
+
+Do general updates.
+
+sudo apt-get update.
+sudo apt-get upgrade.
+Update services specified in readme.
+
+Google to find what the latest stable version is.
+Google "ubuntu install service version".
+Follow the instructions.
+Ensure that you have points for upgrading the kernel, each service specified in the readme, and bash if it is vulnerable to shellshock.
+
+Configure services
+
+Check service configuration files for required services. Usually a wrong setting in a config file for sql, apache, etc. will be a point.
+
+Ensure all services are legitimate.
+
+service --status-all
+
+Check the installed packages for "hacking tools," such as password crackers.
+
+Run other (more comprehensive) checklists. This is checklist designed to get most of the common points, but it may not catch everything.
+
+Tips
+Netcat is installed by default in ubuntu. You will most likely not get points for removing this version.
+Some services (such as ssh) may be required even if they are not mentioned in the readme. Others may be points even if they are explicitly mentioned in the readme
+$
+$
+$
+
+Change insecure root password
+
+Removed program Crack
+
+Removed program Hydra
+
+Removed program John the Ripper
+
+Removed program Nginx
+
+Removed program telnetd
+
+Removed program logkeys
+
+SSH root login disabled
+
+SSH don't permit empty password
+
+Remove users
+
+Check administrators
+
+Add users
+
+$ Turn on firewall
+$ ufw enable or sudo apt-get install gufw
+
+Ufw logging on high
+
+$ Don't allow telnentd through firewall
+$ port 23
+
+Check for updates daily
+
+Performed updates and restarted computer
+
+Remove insecure sudoers.d configuration
+
+Remove insecure README sudo configuration
+
+Remove insecure sudoers configuration
+
+Set correct password length and complexity
+
+Set maximum password age
+
+Set account lockout policy	
+
+remove illegal bash shell
+
+give users passwords
+
+$ Removed guest account
+$ "cd /usr/share/lightdm/lightdm.conf.d/"
+$ Then "sudo gedit 50-unbuntu.conf"
+$ After that in the file that pops up add the line "allow-guest=false"
+$ Then add "greeter-show-manual-login=true" *makes it so you have to type in the users whole login not just password
+$ Then do "sudo service lightdm restart
+
+
+Remove Illegal Media File HailHydra
+
+Turn on cookie protection
+
+Removed hidden root users
+
+Removed hidden root user 'Antivirus'
+
+Disable root account    grep -ic -e "root:x:0:0:root:/root:/sbin/nologin" /etc/passwd
+
+Secure cron             ls -la /etc/ | grep -ic -e "cron.allow" -e "at.allow
+
+Disable control-alt-delete	
+sudo nano /etc/init/control-alt-delete.conf
+then find the line that says "exec shutdown -r now" or sum like that and comment it out
+or try 
+sudo systemctl mask ctrl-alt-del.target && systemctl daemon-reload
+
+Remove hidden messages 
+
+Remove hidden directories
+
+Remove hidden password list     locate password(s).txt locate user(s).txt
+
+Remove illegal lines preventing history from recording 
+
+Remove insecure service rsh
+do service --status-all
+Remove Finn from sudo group 
+
+Remove insecure login group    /etc/passwd
+
+Remove all scheduled cron jobs  ls -la /var/spool/cron/crontabs
+
+Remove Netcat Backdoor 'nc'
+
+Remove Netcat
+
+Remove cron script turning off ufw
+
+Remove insecure scripts from init.d
+
+Change insecure permissions for /etc/passwd     chmod 640 or 600
+
+Change insecure permissions for /etc/group      chmod 640 or 600
+
+Change insecure permissions for /etc/shadow
+
+Samba secure encryption (if needed)
+go into the samba config files and make it say this 
+server signing = mandatory
+    smb encrypt = mandatory
+
+Remove prohibited game content aisleriot 
+
+Change owner for /etc/passwd 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 

@@ -454,6 +454,14 @@ Change owner for /etc/passwd
 
 
 
+PAM*****************************
+to enforce password history add "remember=5" to the end of the line that has "pam_unix.so"
+to enforce password length add "milen=8" to the end of the line that has "pam_unix.so"
+to enforce password complexity with one character  add "ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1" at the end
+of the line with "pam_cracklib.so"
+
+
+
 
 
 

@@ -205,6 +205,249 @@ Just use those commands one by one to disable ipv6
 no need to edit anything just one by one paste them in terminal
 then do "ip a" and make sure no instance of ipv6 shows up
 $
+Apache serv Security now
+
+1.Install and configure Firewall – ufw
+2.Secure shared memory – fstab
+3.SSH – Key based login, disable root login and change port
+4.Apache SSL – Disable SSL v3 support
+5.Protect su by limiting access only to admin group
+6.Harden network with sysctl settings
+7.Disable Open DNS Recursion and Remove Version Info – Bind9 DNS
+8.Prevent IP Spoofing
+9.Harden PHP for security
+10.Restrict Apache Information Leakage
+11.Install and configure Apache application firewall – ModSecurity
+12.Protect from DDOS (Denial of Service) attacks with ModEvasive
+13.Scan logs and ban suspicious hosts – DenyHosts and Fail2Ban
+14.Intrusion Detection – PSAD
+15.Check for RootKits – RKHunter and CHKRootKit
+16.Scan open Ports – Nmap
+17.Analyse system LOG files – LogWatch
+18.Apparmor – Application Armor
+19.Audit your system security – Tiger and Tripwire
+$
+Secure shared memory
+sudo nano /etc/fstab
+Add the following line and save. You will need to reboot for this setting to take effect :
+Note : This only is works in Ubuntu 12.10 or later – For earlier Ubuntu versions replace /run/shm with /dev/shm 
+Save and Reboot when done
+$
+More ssh 
+The best way to secure SSH is to use public/private key based login. See SSH/OpenSSH/Keys
+If you have to use password authentication, the easiest way to secure SSH is to disable root login and change the SSH port to something different than the standard port 22.
+Before disabling the root login create a new SSH user and make sure the user belongs to the admin group (see step 4. below regarding the admin group).
+if you change the SSH port keep the port number below 1024 as these are priviledged ports that can only be opened by root or processes running as root.
+If you change the SSH port also open the new port you have chosen on the firewall and close port 22.
+
+sudo nano /etc/ssh/sshd_config
+Port (keep below 1024)
+Protocol 2
+PermitRootLogin no
+DebianBanner no
+
+sudo service ssh restart
+$
+Apache SSL hardening
+The SSL v2/v3 protocol has been proven to be insecure.
+We will disable Apache support for the protocol and force the use of the newer protocols.
+
+sudo nano /etc/apache2/mods-available/ssl.conf
+
+Change this line from :
+SSLProtocol all -SSLv3
+To the following and save:
+SSLProtocol all -SSLv2 -SSLv3 
+then restart that mf
+sudo service apache2 restart
+$
+ Protect su by limiting access only to admin group
+ To limit the use of su by admin users only we need to create an admin group, then add users and limit the use of su to the admin group.
+Add a admin group to the system and add your own admin username to the group by replacing <YOUR ADMIN USERNAME> below with your admin username
+
+sudo groupadd admin
+sudo usermod -a -G admin
+sudo dpkg-statoverride --update --add root admin 4750 /bin/su
+$
+Harden network with sysctl settings
+The /etc/sysctl.conf file contain all the sysctl settings.
+Prevent source routing of incoming packets and log malformed IP’s enter the following in a terminal window
+
+sudo nano /etc/sysctl.conf
+
+Edit the /etc/sysctl.conf file and un-comment or add the following lines :
+# IP Spoofing protection
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+
+# Ignore ICMP broadcast requests
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+
+# Disable source packet routing
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv6.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv6.conf.default.accept_source_route = 0
+
+# Ignore send redirects
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+
+# Block SYN attacks
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_max_syn_backlog = 2048
+net.ipv4.tcp_synack_retries = 2
+net.ipv4.tcp_syn_retries = 5
+
+# Log Martians
+net.ipv4.conf.all.log_martians = 1
+net.ipv4.icmp_ignore_bogus_error_responses = 1
+
+# Ignore ICMP redirects
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv6.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv6.conf.default.accept_redirects = 0
+
+# Ignore Directed pings
+net.ipv4.icmp_echo_ignore_all = 1
+
+To reload sysctl with the latest changes, enter:
+sudo sysctl -p
+$
+Disable Open DNS Recursion and Remove Version Info
+
+sudo nano /etc/bind/named.conf.options
+
+Add the following to the Options section :
+recursion no;
+version "Not Disclosed";
+
+Restart BIND DNS server. Open a Terminal and enter the following :
+sudo service bind9 restart
+$
+Prevent IP Spoofing.
+
+Open a Terminal and enter the following :
+sudo nano /etc/host.conf
+
+Add or edit the following lines :
+order bind,hosts
+nospoof on
+$
+PHP security 
+
+Edit the php.ini file :
+sudo nano /etc/php5/apache2/php.ini
+
+Add or edit the following lines an save :
+disable_functions = exec,system,shell_exec,passthru
+register_globals = Off
+expose_php = Off
+display_errors = Off
+track_errors = Off
+html_errors = Off
+magic_quotes_gpc = Off
+mail.add_x_header = Off
+session.name = NEWSESSID
+
+Restart Apache server. Open a Terminal and enter the following :
+sudo service apache2 restart
+
+Restrict Apache Information Leakage.
+Edit the Apache2 configuration security file :
+sudo vi /etc/apache2/conf-available/security.conf
+
+Add or edit the following lines and save :
+ServerTokens Prod
+ServerSignature Off
+TraceEnable Off
+Header unset ETag
+Header always unset X-Powered-By
+FileETag None
+
+Restart Apache server. Open a Terminal and enter the following :
+sudo service apache2 restart
+
+$$$$$$$$$$$$$$$$$
+DenyHosts is a python program that automatically blocks SSH attacks by adding entries to /etc/hosts.deny. DenyHosts will also inform Linux administrators about offending hosts, attacked users and suspicious logins.
+Open a Terminal and enter the following :
+sudo apt-get install denyhosts
+
+After installation edit the configuration file /etc/denyhosts.conf  and change the email, and other settings as required.
+To edit the admin email settings open a terminal window and enter:
+sudo vi /etc/denyhosts.conf
+
+Change the following values as required on your server :
+ADMIN_EMAIL = root@localhost
+SMTP_HOST = localhost
+SMTP_PORT = 25
+#SMTP_USERNAME=foo
+#SMTP_PASSWORD=bar
+SMTP_FROM = DenyHosts nobody@localhost
+#SYSLOG_REPORT=YES
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+Fail2ban is more advanced than DenyHosts as it extends the log monitoring to other services including SSH, Apache, Courier, FTP, and more.
+Fail2ban scans log files and bans IPs that show the malicious signs — too many password failures, seeking for exploits, etc.
+Generally Fail2Ban then used to update firewall rules to reject the IP addresses for a specified amount of time, although any arbitrary other action could also be configured.
+Out of the box Fail2Ban comes with filters for various services (apache, courier, ftp, ssh, etc).
+Open a Terminal and enter the following :
+sudo apt-get install fail2ban
+
+After installation edit the configuration file /etc/fail2ban/jail.local  and create the filter rules as required.
+To edit the settings open a terminal window and enter:
+sudo vi /etc/fail2ban/jail.conf
+
+Activate all the services you would like fail2ban to monitor by changing enabled = false to enabled = true
+For example if you would like to enable the SSH monitoring and banning jail, find the line below and change enabled from false to true. Thats it.
+[sshd]
+
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+
+If you would like to receive emails from Fail2Ban if hosts are banned change the following line to your email address.
+destemail = root@localhost
+
+and change the following line from :
+action = %(action_)s
+
+to:
+action = %(action_mwl)s
+
+You can also create rule filters for the various services that you would like fail2ban to monitor that is not supplied by default.
+sudo vi /etc/fail2ban/jail.local
+
+Good instructions on how to configure fail2ban and create the various filters can be found on HowtoForge – click here for an example
+When done with the configuration of Fail2Ban restart the service with :
+sudo service fail2ban restart
+
+You can also check the status with:
+sudo fail2ban-client status
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+sudo apt-get install nmap
+
+Scan your system for open ports with :
+nmap -v -sT localhost
+
+SYN scanning with the following :
+sudo nmap -v -sS localhost
+$
+sudo apt-get install tiger tripwire
+
+To setup Tripwire good installation guides can be found on Digital Ocean here and on Unixmen here
+To run tiger enter :
+sudo tiger
+
+All Tiger output can be found in the /var/log/tiger
+To view the tiger security reports, open a Terminal and enter the following :
+sudo less /var/log/tiger/security.report.*
 
 
 
@@ -212,4 +455,5 @@ $
 
 
 
- 
+
+

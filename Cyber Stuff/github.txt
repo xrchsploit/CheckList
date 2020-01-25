@@ -854,6 +854,69 @@ $$$ ntp is a daemon which implements the Network Time Protocol (NTP). It is desi
  /etc/init.d/ntp:
  RUNASUSER=ntp
 $$$ 
+Securing FTP
+ We will begin by creating a subdirectory under: /etc/ssl/ to store the SSL/TLS certificate and key files if it doesn’t exist:
+
+sudo mkdir /etc/ssl/private
+
+ Now let’s generate the certificate and key in a single file, by running the command below.
+
+ sudo openssl req -x509 -nodes -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem -days 365 -newkey rsa:2048
+sudo ufw allow 990/tcp
+sudo ufw allow 40000:50000/tcp
+sudo ufw status
+
+Now, open the VSFTPD config file and define the SSL details in it:
+
+sudo nano /etc/vsftpd/vsftpd.conf
+
+Then, add or locate the option ssl_enable and set its value to YES to activate the use of SSL, again, because TLS is more secure than SSL, we will restrict VSFTPD to use TLS instead, by enabling the ssl_tlsv1 option:
+
+ssl_enable=YES
+ssl_tlsv1=YES
+ssl_sslv2=NO
+ssl_sslv3=NO
+
+Next, comment out the lines below using the # character as follows:
+
+#rsa_cert_file=/etc/ssl/private/ssl-cert-snakeoil.pem
+#rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+Afterwards, add the lines below to define the location of the SSL certificate and key file:
+
+rsa_cert_file=/etc/ssl/private/vsftpd.pem
+rsa_private_key_file=/etc/ssl/private/vsftpd.pem
+6. Now, we also have to prevent anonymous users from using SSL, then force all non-anonymous logins to use a secure SSL connection for data transfer and to send the password during login:
+
+allow_anon_ssl=NO
+force_local_data_ssl=YES
+force_local_logins_ssl=YES
+
+With option require_ssl_reuse=YES, all SSL data connections are required to exhibit SSL session reuse; proving that they know the same master secret as the control channel. So, we should disable it.
+
+require_ssl_reuse=NO
+
+This will help frustrate any efforts by attackers who try to force a specific cipher which they possibly discovered vulnerabilities in:
+
+ssl_ciphers=HIGH
+
+Then, let’s define the port range (min and max port) of passive ports.
+
+pasv_min_port=40000
+pasv_max_port=50000
+
+To enable SSL debugging, meaning openSSL connection diagnostics are recorded to the VSFTPD log file, we can use the debug_ssl option:
+
+debug_ssl=YES
+
+Finally save the file and close it. Then restart VSFTPD service:
+
+systemctl restart vsftpd
+
+
+
+
+
+
 
 
 
